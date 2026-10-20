@@ -56,7 +56,7 @@ while ($running) {
     try {
         $stream = [System.IO.File]::Open($filePath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
         try {
-            $archive = New-Object System.IO.Compression.ZipArchive($stream, [System.IO.Compression.ZipArchiveMode]::Create, $false)
+            $archive = [System.IO.Compression.ZipArchive]::new($stream, [System.IO.Compression.ZipArchiveMode]::Create, $false)
             $archive.Dispose()
         }
         finally {
@@ -72,12 +72,9 @@ while ($running) {
         Write-Host ' Files Created' -ForegroundColor White
     }
     catch {
-        # If a same-named archive already exists, replace it for this session.
-        Write-Host 'Boo! ' -NoNewline -ForegroundColor White
-        Write-Host $nextCount -NoNewline -ForegroundColor Red
-        Write-Host ' Files Created' -ForegroundColor White
-        $count = $nextCount
-        $totalBytes += 22
+        # Stop rather than report a file that was not actually created.
+        $running = $false
+        break
     }
 
     # Poll frequently so Esc stops the loop promptly while preserving the 0.2 s rhythm.
