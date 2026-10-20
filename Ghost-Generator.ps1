@@ -30,7 +30,7 @@ foreach ($number in @(3, 2, 1)) {
     $line = [string]$number
     $left = [Math]::Max(0, [int](($window.Width - $line.Length) / 2))
     $top = [Math]::Max(0, [int]($window.Height / 2))
-    $host.UI.RawUI.CursorPosition = New-Object Management.Automation.Host.Coordinates($left, $top)
+    $host.UI.RawUI.CursorPosition = [System.Management.Automation.Host.Coordinates]::new($left, $top)
     Write-Host $line -NoNewline
     Start-Sleep -Seconds 1
 }
@@ -52,6 +52,9 @@ while ($running) {
     $nextCount = $count + 1
     $fileName = 'Gh' + ('o' * $nextCount) + 'st.zip'
     $filePath = Join-Path $baseDirectory $fileName
+
+    # Windows file systems limit a single filename component to 255 characters.
+    if ($fileName.Length -gt 255) { break }
 
     try {
         $stream = [System.IO.File]::Open($filePath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
