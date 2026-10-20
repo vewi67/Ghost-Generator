@@ -1,6 +1,11 @@
 $ErrorActionPreference = 'Stop'
 
-$ghostPath = Join-Path $PSScriptRoot 'ghost.txt'
+$baseDirectory = if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+    $PSScriptRoot
+} else {
+    [System.AppDomain]::CurrentDomain.BaseDirectory
+}
+$ghostPath = Join-Path $baseDirectory 'ghost.txt'
 if (-not (Test-Path -LiteralPath $ghostPath -PathType Leaf)) {
     Write-Error 'ghost.txt must be next to Ghost-Generator.exe.'
     exit 1
@@ -44,7 +49,6 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $count = 0
 $totalBytes = [long]0
-$baseDirectory = $PSScriptRoot
 $running = $true
 
 while ($running) {
