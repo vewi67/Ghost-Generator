@@ -1,0 +1,37 @@
+name: Build Ghost Generator
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PowerShell module
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module ps2exe -Scope CurrentUser -Force
+          Import-Module ps2exe
+
+      - name: Build executable and package required ghost art
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Invoke-PS2EXE -InputFile .\Ghost-Generator.ps1 -OutputFile .\dist\Ghost-Generator.exe
+          Copy-Item .\ghost.txt .\dist\ghost.txt
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ghost-Generator-Windows
+          path: dist/
+          if-no-files-found: error
