@@ -39,7 +39,22 @@ jobs:
           path: Ghost-Generator-Windows.zip
           if-no-files-found: error
 
-      - name: Publish release package
+      - name: Publish first public release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: Ghost Generator v1.0.0
+          target_commitish: main
+          body: |
+            The first public release of Ghost Generator.
+
+            Download `Ghost-Generator-Windows.zip`, extract it, and keep `Ghost-Generator.exe` and `ghost.txt` together in the same folder.
+            Run the executable on Windows, press Enter to start, and press Esc to stop creating ZIP files.
+          files: Ghost-Generator-Windows.zip
+          make_latest: true
+
+      - name: Publish tagged release package
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
