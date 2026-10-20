@@ -12,6 +12,40 @@ if (-not (Test-Path -LiteralPath $ghostPath -PathType Leaf)) {
 }
 
 $ghost = Get-Content -LiteralPath $ghostPath
+
+# Maximize the console before drawing the ASCII art.
+# F11 is not a reliable fullscreen shortcut for the classic Windows console.
+try {
+    if (-not ('GhostGeneratorConsole' -as [type])) {
+        Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+
+public static class GhostGeneratorConsole
+{
+    [DllImport("kernel32.dll")]
+    private static extern IntPtr GetConsoleWindow();
+
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    public static void Maximize()
+    {
+        IntPtr handle = GetConsoleWindow();
+        if (handle != IntPtr.Zero)
+        {
+            ShowWindow(handle, 3); // SW_MAXIMIZE
+        }
+    }
+}
+'@
+    }
+    [GhostGeneratorConsole]::Maximize()
+    Start-Sleep -Milliseconds 250
+} catch {
+    # Keep running normally if Windows does not allow console resizing.
+}
+
 $host.UI.RawUI.BackgroundColor = 'Black'
 $host.UI.RawUI.ForegroundColor = 'White'
 Clear-Host
