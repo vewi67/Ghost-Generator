@@ -3,10 +3,12 @@ name: Build Ghost Generator
 on:
   push:
     branches: [main]
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-windows-exe:
@@ -28,10 +30,18 @@ jobs:
           New-Item -ItemType Directory -Path dist -Force | Out-Null
           Invoke-PS2EXE -InputFile .\Ghost-Generator.ps1 -OutputFile .\dist\Ghost-Generator.exe
           Copy-Item .\ghost.txt .\dist\ghost.txt
+          Compress-Archive -Path .\dist\Ghost-Generator.exe, .\dist\ghost.txt -DestinationPath .\Ghost-Generator-Windows.zip -Force
 
-      - name: Upload Windows build
+      - name: Upload Windows build artifact
         uses: actions/upload-artifact@v4
         with:
           name: Ghost-Generator-Windows
-          path: dist/
+          path: Ghost-Generator-Windows.zip
           if-no-files-found: error
+
+      - name: Publish release package
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Ghost-Generator-Windows.zip
+          generate_release_notes: true
