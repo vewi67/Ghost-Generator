@@ -41,6 +41,10 @@ Copy-Item .\ghost.txt .\ghost.txt
 
 Keep `ghost.txt` next to the generated executable. The GitHub Actions workflow builds the executable automatically on pushes to `main` and publishes a downloadable package when a version tag such as `v1.0.0` is pushed.
 
+## Ghost Series
+
+Ghost Generator is part of the **Ghost Series**, a collection of small, intentionally odd programs built around one simple idea taken to an absurd extreme. Each entry is a standalone program with its own purpose and personality. Ghost Generator contributes the series' delightfully pointless ZIP-making experiment.
+
 ## License
 
 Released under the MIT License. See [LICENSE](LICENSE).
